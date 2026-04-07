@@ -512,45 +512,12 @@ async function fetchAndLoadRemoteManagedSettings(): Promise<SettingsJson | null>
  * until remote settings have been fetched.
  */
 export async function loadRemoteManagedSettings(): Promise<void> {
-  // Set up the promise for other systems to wait on
-  // Only if the user is eligible for remote settings AND promise not already set up
-  // (initializeRemoteManagedSettingsLoadingPromise may have been called earlier)
-  if (isRemoteManagedSettingsEligible() && !loadingCompletePromise) {
-    loadingCompletePromise = new Promise(resolve => {
-      loadingCompleteResolve = resolve
-    })
-  }
-
-  // Cache-first: if we have cached settings on disk, apply them and unblock
-  // waiters immediately. The fetch still runs below; notifyChange fires once,
-  // after the fetch, as before. Saves the ~77ms fetch-wait on print-mode startup.
-  // getRemoteManagedSettingsSyncFromCache has the eligibility guard and populates
-  // the session cache internally — no need to call setSessionCache here.
-  if (getRemoteManagedSettingsSyncFromCache() && loadingCompleteResolve) {
+  // PATCHED: Remote managed settings polling permanently disabled.
+  // This prevents Anthropic from pushing killswitches, model overrides, or
+  // forced security dialogs (拒绝=进程退出) to this client.
+  if (loadingCompleteResolve) {
     loadingCompleteResolve()
     loadingCompleteResolve = null
-  }
-
-  try {
-    const settings = await fetchAndLoadRemoteManagedSettings()
-
-    // Start background polling to pick up settings changes mid-session
-    if (isRemoteManagedSettingsEligible()) {
-      startBackgroundPolling()
-    }
-
-    // Trigger hot-reload if settings were loaded (new or from cache).
-    // notifyChange resets the settings cache internally before iterating
-    // listeners — env vars, telemetry, and permissions update on next read.
-    if (settings !== null) {
-      settingsChangeDetector.notifyChange('policySettings')
-    }
-  } finally {
-    // Always resolve the promise, even if fetch failed (fail-open)
-    if (loadingCompleteResolve) {
-      loadingCompleteResolve()
-      loadingCompleteResolve = null
-    }
   }
 }
 

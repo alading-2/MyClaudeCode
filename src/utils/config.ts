@@ -483,10 +483,10 @@ export type GlobalConfig = {
   officialMarketplaceAutoInstallAttempted?: boolean // Whether auto-install was attempted
   officialMarketplaceAutoInstalled?: boolean // Whether auto-install succeeded
   officialMarketplaceAutoInstallFailReason?:
-    | 'policy_blocked'
-    | 'git_unavailable'
-    | 'gcs_unavailable'
-    | 'unknown' // Reason for failure if applicable
+  | 'policy_blocked'
+  | 'git_unavailable'
+  | 'gcs_unavailable'
+  | 'unknown' // Reason for failure if applicable
   officialMarketplaceAutoInstallRetryCount?: number // Number of retry attempts
   officialMarketplaceAutoInstallLastAttemptTime?: number // Timestamp of last attempt
   officialMarketplaceAutoInstallNextRetryTime?: number // Earliest time to retry again
@@ -918,12 +918,12 @@ function migrateConfigFields(config: GlobalConfig): GlobalConfig {
   // autoUpdaterStatus is removed from the type but may exist in old configs
   const legacy = config as GlobalConfig & {
     autoUpdaterStatus?:
-      | 'migrated'
-      | 'installed'
-      | 'disabled'
-      | 'enabled'
-      | 'no_permissions'
-      | 'not_configured'
+    | 'migrated'
+    | 'installed'
+    | 'disabled'
+    | 'enabled'
+    | 'no_permissions'
+    | 'not_configured'
   }
 
   // Determine install method and auto-update preference from old field
@@ -1024,7 +1024,7 @@ function startGlobalConfigFreshnessWatcher(): void {
           }
           lastReadFileStats = { mtime: curr.mtimeMs, size: curr.size }
         })
-        .catch(() => {})
+        .catch(() => { })
     },
   )
   registerCleanup(async () => {
@@ -1285,10 +1285,10 @@ function saveConfigWithLock<A extends object>(
       // Re-read if we just created one; otherwise reuse the list
       const backupsForCleanup = shouldCreateBackup
         ? fs
-            .readdirStringSync(backupDir)
-            .filter(f => f.startsWith(`${fileBase}.backup.`))
-            .sort()
-            .reverse()
+          .readdirStringSync(backupDir)
+          .filter(f => f.startsWith(`${fileBase}.backup.`))
+          .sort()
+          .reverse()
         : existingBackups
 
       for (const oldBackup of backupsForCleanup.slice(MAX_BACKUPS)) {
@@ -1455,8 +1455,8 @@ function getConfig<A>(
       if (backupPath) {
         process.stderr.write(
           `\nClaude configuration file not found at: ${file}\n` +
-            `A backup file exists at: ${backupPath}\n` +
-            `You can manually restore it by running: cp "${backupPath}" "${file}"\n\n`,
+          `A backup file exists at: ${backupPath}\n` +
+          `You can manually restore it by running: cp "${backupPath}" "${file}"\n\n`,
         )
       }
       return createDefault()
@@ -1573,7 +1573,7 @@ function getConfig<A>(
       if (backupPath) {
         process.stderr.write(
           `A backup file exists at: ${backupPath}\n` +
-            `You can manually restore it by running: cp "${backupPath}" "${file}"\n\n`,
+          `You can manually restore it by running: cp "${backupPath}" "${file}"\n\n`,
         )
       } else {
         process.stderr.write(`\n`)
@@ -1733,25 +1733,8 @@ export function formatAutoUpdaterDisabledReason(
 }
 
 export function getAutoUpdaterDisabledReason(): AutoUpdaterDisabledReason | null {
-  if (process.env.NODE_ENV === 'development') {
-    return { type: 'development' }
-  }
-  if (isEnvTruthy(process.env.DISABLE_AUTOUPDATER)) {
-    return { type: 'env', envVar: 'DISABLE_AUTOUPDATER' }
-  }
-  const essentialTrafficEnvVar = getEssentialTrafficOnlyReason()
-  if (essentialTrafficEnvVar) {
-    return { type: 'env', envVar: essentialTrafficEnvVar }
-  }
-  const config = getGlobalConfig()
-  if (
-    config.autoUpdates === false &&
-    (config.installMethod !== 'native' ||
-      config.autoUpdatesProtectedForNative !== true)
-  ) {
-    return { type: 'config' }
-  }
-  return null
+  // PATCHED: Auto-updater permanently disabled — this build manages its own versioning.
+  return { type: 'config' }
 }
 
 export function getOrCreateUserID(): string {

@@ -53,6 +53,10 @@ export function AutoUpdater({
       logForDebugging('AutoUpdater: Skipping update check in test/dev environment');
       return;
     }
+    // PATCHED: auto-updates permanently disabled — skip npm registry call
+    if (isAutoUpdaterDisabled()) {
+      return;
+    }
     const currentVersion = MACRO.VERSION;
     const channel = getInitialSettings()?.autoUpdatesChannel ?? 'latest';
     let latestVersion = await getLatestVersion(channel);

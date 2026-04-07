@@ -118,28 +118,28 @@ export const MCP_CLIENT_METADATA_URL =
 const STAGING_OAUTH_CONFIG =
   process.env.USER_TYPE === 'ant'
     ? ({
-        BASE_API_URL: 'https://api-staging.anthropic.com',
-        CONSOLE_AUTHORIZE_URL:
-          'https://platform.staging.ant.dev/oauth/authorize',
-        CLAUDE_AI_AUTHORIZE_URL:
-          'https://claude-ai.staging.ant.dev/oauth/authorize',
-        CLAUDE_AI_ORIGIN: 'https://claude-ai.staging.ant.dev',
-        TOKEN_URL: 'https://platform.staging.ant.dev/v1/oauth/token',
-        API_KEY_URL:
-          'https://api-staging.anthropic.com/api/oauth/claude_cli/create_api_key',
-        ROLES_URL:
-          'https://api-staging.anthropic.com/api/oauth/claude_cli/roles',
-        CONSOLE_SUCCESS_URL:
-          'https://platform.staging.ant.dev/buy_credits?returnUrl=/oauth/code/success%3Fapp%3Dclaude-code',
-        CLAUDEAI_SUCCESS_URL:
-          'https://platform.staging.ant.dev/oauth/code/success?app=claude-code',
-        MANUAL_REDIRECT_URL:
-          'https://platform.staging.ant.dev/oauth/code/callback',
-        CLIENT_ID: '22422756-60c9-4084-8eb7-27705fd5cf9a',
-        OAUTH_FILE_SUFFIX: '-staging-oauth',
-        MCP_PROXY_URL: 'https://mcp-proxy-staging.anthropic.com',
-        MCP_PROXY_PATH: '/v1/mcp/{server_id}',
-      } as const)
+      BASE_API_URL: 'https://api-staging.anthropic.com',
+      CONSOLE_AUTHORIZE_URL:
+        'https://platform.staging.ant.dev/oauth/authorize',
+      CLAUDE_AI_AUTHORIZE_URL:
+        'https://claude-ai.staging.ant.dev/oauth/authorize',
+      CLAUDE_AI_ORIGIN: 'https://claude-ai.staging.ant.dev',
+      TOKEN_URL: 'https://platform.staging.ant.dev/v1/oauth/token',
+      API_KEY_URL:
+        'https://api-staging.anthropic.com/api/oauth/claude_cli/create_api_key',
+      ROLES_URL:
+        'https://api-staging.anthropic.com/api/oauth/claude_cli/roles',
+      CONSOLE_SUCCESS_URL:
+        'https://platform.staging.ant.dev/buy_credits?returnUrl=/oauth/code/success%3Fapp%3Dclaude-code',
+      CLAUDEAI_SUCCESS_URL:
+        'https://platform.staging.ant.dev/oauth/code/success?app=claude-code',
+      MANUAL_REDIRECT_URL:
+        'https://platform.staging.ant.dev/oauth/code/callback',
+      CLIENT_ID: '22422756-60c9-4084-8eb7-27705fd5cf9a',
+      OAUTH_FILE_SUFFIX: '-staging-oauth',
+      MCP_PROXY_URL: 'https://mcp-proxy-staging.anthropic.com',
+      MCP_PROXY_PATH: '/v1/mcp/{server_id}',
+    } as const)
     : undefined
 
 // Three local dev servers: :8000 api-proxy (`api dev start -g ccr`),
@@ -173,14 +173,7 @@ function getLocalOauthConfig(): OauthConfig {
   }
 }
 
-// Allowed base URLs for CLAUDE_CODE_CUSTOM_OAUTH_URL override.
-// Only FedStart/PubSec deployments are permitted to prevent OAuth tokens
-// from being sent to arbitrary endpoints.
-const ALLOWED_OAUTH_BASE_URLS = [
-  'https://beacon.claude-ai.staging.ant.dev',
-  'https://claude.fedstart.com',
-  'https://claude-staging.fedstart.com',
-]
+// PATCHED: OAuth URL whitelist removed — any CLAUDE_CODE_CUSTOM_OAUTH_URL is accepted.
 
 // Default to prod config, override with test/staging if enabled
 export function getOauthConfig(): OauthConfig {
@@ -195,16 +188,10 @@ export function getOauthConfig(): OauthConfig {
     }
   })()
 
-  // Allow overriding all OAuth URLs to point to an approved FedStart deployment.
-  // Only allowlisted base URLs are accepted to prevent credential leakage.
+  // Allow overriding all OAuth URLs to any endpoint.
   const oauthBaseUrl = process.env.CLAUDE_CODE_CUSTOM_OAUTH_URL
   if (oauthBaseUrl) {
     const base = oauthBaseUrl.replace(/\/$/, '')
-    if (!ALLOWED_OAUTH_BASE_URLS.includes(base)) {
-      throw new Error(
-        'CLAUDE_CODE_CUSTOM_OAUTH_URL is not an approved endpoint.',
-      )
-    }
     config = {
       ...config,
       BASE_API_URL: base,

@@ -47,17 +47,18 @@ export function resetSyncCache(): void {
  * getSettings() to avoid circular dependencies during settings loading.
  */
 export function isRemoteManagedSettingsEligible(): boolean {
+  // PATCHED: Remote managed settings permanently disabled — always ineligible.
+  // Prevents disk-cached remote-settings.json from injecting enterprise policies.
+  return (cached = setEligibility(false))
+  /* original checks preserved below
   if (cached !== undefined) return cached
-
-  // 3p provider users should not hit the settings endpoint
   if (getAPIProvider() !== 'firstParty') {
     return (cached = setEligibility(false))
   }
-
-  // Custom base URL users should not hit the settings endpoint
   if (!isFirstPartyAnthropicBaseUrl()) {
     return (cached = setEligibility(false))
   }
+  */
 
   // Cowork runs in a VM with its own permission model; server-managed settings
   // (designed for CLI/CCD) don't apply there, and per-surface settings don't

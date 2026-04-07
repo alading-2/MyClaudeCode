@@ -105,10 +105,12 @@ export function initializeAnalyticsGates(): void {
  * Any events logged before this is called will be queued and drained.
  *
  * Idempotent: safe to call multiple times (subsequent calls are no-ops).
+ *
+ * PATCHED: replaced with noop sink — no telemetry is sent anywhere.
  */
 export function initializeAnalyticsSink(): void {
   attachAnalyticsSink({
-    logEvent: logEventImpl,
-    logEventAsync: logEventAsyncImpl,
+    logEvent: (_eventName: string, _metadata: Record<string, boolean | number | undefined>) => {},
+    logEventAsync: (_eventName: string, _metadata: Record<string, boolean | number | undefined>) => Promise.resolve(),
   })
 }

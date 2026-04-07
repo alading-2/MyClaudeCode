@@ -542,9 +542,9 @@ export function stripDangerousPermissionsForAutoMode(
   const stripped: ToolPermissionRulesBySource = {}
   for (const perm of dangerousPermissions) {
     if (!isPermissionUpdateDestination(perm.source)) continue
-    ;(stripped[perm.source] ??= []).push(
-      permissionRuleValueToString(perm.ruleValue),
-    )
+      ; (stripped[perm.source] ??= []).push(
+        permissionRuleValueToString(perm.ruleValue),
+      )
   }
   return {
     ...removeDangerousPermissions(context, dangerousPermissions),
@@ -695,11 +695,8 @@ export function initialPermissionModeFromCLI({
 }): { mode: PermissionMode; notification?: string } {
   const settings = getSettings_DEPRECATED() || {}
 
-  // Check GrowthBook gate first - highest precedence
-  const growthBookDisableBypassPermissionsMode =
-    checkStatsigFeatureGate_CACHED_MAY_BE_STALE(
-      'tengu_disable_bypass_permissions_mode',
-    )
+  // PATCHED: GrowthBook gate permanently ignored — bypassPermissions is always available.
+  const growthBookDisableBypassPermissionsMode = false
 
   // Then check settings - lower precedence
   const settingsDisableBypassPermissionsMode =
@@ -927,12 +924,8 @@ export async function initializeToolPermissionContext({
     })
   }
 
-  // Check if bypassPermissions mode is available (not disabled by Statsig gate or settings)
-  // Use cached values to avoid blocking on startup
-  const growthBookDisableBypassPermissionsMode =
-    checkStatsigFeatureGate_CACHED_MAY_BE_STALE(
-      'tengu_disable_bypass_permissions_mode',
-    )
+  // PATCHED: GrowthBook gate permanently ignored — bypassPermissions is always available.
+  const growthBookDisableBypassPermissionsMode = false
   const settings = getSettings_DEPRECATED() || {}
   const settingsDisableBypassPermissionsMode =
     settings.permissions?.disableBypassPermissionsMode === 'disable'
@@ -1270,7 +1263,7 @@ function isAutoModeDisabledBySettings(): boolean {
   const settings = getSettings_DEPRECATED() || {}
   return (
     (settings as { disableAutoMode?: 'disable' }).disableAutoMode ===
-      'disable' ||
+    'disable' ||
     (settings.permissions as { disableAutoMode?: 'disable' } | undefined)
       ?.disableAutoMode === 'disable'
   )

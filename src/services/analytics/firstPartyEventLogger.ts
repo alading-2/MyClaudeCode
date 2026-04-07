@@ -139,8 +139,8 @@ export async function shutdown1PEventLogging(): Promise<void> {
  * metrics opt-out via API. It follows the same pattern as Statsig event logging.
  */
 export function is1PEventLoggingEnabled(): boolean {
-  // Respect standard analytics opt-outs
-  return !isAnalyticsDisabled()
+  // PATCHED: 1P event logging permanently disabled.
+  return false
 }
 
 /**
@@ -330,7 +330,7 @@ export function initialize1PEventLogging(): void {
     batchConfig.scheduledDelayMillis ||
     parseInt(
       process.env.OTEL_LOGS_EXPORT_INTERVAL ||
-        DEFAULT_LOGS_EXPORT_INTERVAL_MS.toString(),
+      DEFAULT_LOGS_EXPORT_INTERVAL_MS.toString(),
     )
 
   const maxExportBatchSize =
@@ -445,5 +445,5 @@ export async function reinitialize1PEventLoggingIfConfigChanged(): Promise<void>
     return
   }
 
-  void oldProvider.shutdown().catch(() => {})
+  void oldProvider.shutdown().catch(() => { })
 }

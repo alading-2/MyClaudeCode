@@ -1,3 +1,36 @@
 {
-    "specstory.cloudSync.enabled": "never"
+    "specstory.cloudSync.enabled": "never",
+    // ── TypeScript ──────────────────────────────────────────────────────────
+    // 使用项目本地安装的 TypeScript（npm install 后生效）
+    "typescript.tsdk": "node_modules/typescript/lib",
+    // 自动检测 tsconfig.json
+    "typescript.tsc.autoDetect": "off",
+    // 允许在 .tsx 文件中使用 JSX
+    "typescript.preferences.jsxAttributeCompletionStyle": "auto",
+    // 路径别名补全
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    // ── 编辑器 ──────────────────────────────────────────────────────────────
+    "editor.formatOnSave": false,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    // ── 文件监视排除（避免监视大目录拖慢 IDE）───────────────────────────────
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/dist/**": true,
+        "**/build-src/**": true,
+        "**/.git/**": true
+    },
+    "files.exclude": {
+        "**/build-src": true
+    },
+    // ── 搜索排除 ────────────────────────────────────────────────────────────
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/build-src": true
+    },
+    // ── 任务 ────────────────────────────────────────────────────────────────
+    // Ctrl+Shift+B 默认触发「构建」任务
+    "task.quickOpen.detail": true,
+    "task.quickOpen.skip": false
 }
